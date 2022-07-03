@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Gizmos = Popcron.Gizmos;
 
 public class Grid : MonoBehaviour{
     //tamanho do  grafo no mundo
@@ -88,11 +89,15 @@ public class Grid : MonoBehaviour{
     public Node NodeFromWorldPoint(Vector3 worldPosition) {
         int x = Mathf.RoundToInt(worldPosition.x - 1 + (gridSizeX / 2));
         int y = Mathf.RoundToInt(worldPosition.y + (gridSizeY / 2));
-        if(x>gridSizeX || x < 0) {
+        if( x < 0) {
             x = 0;
+        }else if (x > gridSizeX) {
+            x = gridSizeX-1;
         }
-        if(y>gridSizeY || y < 0) {
+        if (y< 0) {
             y = 0;
+        } else if (y > gridSizeY) {
+            y = gridSizeY-1;
         }
         return grid[x, y];
     }
@@ -100,28 +105,28 @@ public class Grid : MonoBehaviour{
 
 
     //Desenha a representação visual do grafo
-    void OnDrawGizmos() {
-        Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, gridWorldSize.y, 1));
+    void Update() {
+        Gizmos.Cube(transform.position,transform.rotation, new Vector3(gridWorldSize.x, gridWorldSize.y, 1));
 
         if (grid != null) {
             foreach (Node n in grid) {
 
                 if (n.obstacle)
-                    Gizmos.color = Color.red;
+                    Gizmos.Cube(n.worldPosition, transform.rotation, Vector3.one * (nodeRadius),Color.red);
                 else
-                    Gizmos.color = Color.white;
+                    Gizmos.Cube(n.worldPosition, transform.rotation, Vector3.one * (nodeRadius), Color.white);
+                
                
                 if (path != null && path.Contains(n))
-                    Gizmos.color = Color.black;
+                    Gizmos.Cube(n.worldPosition, transform.rotation, Vector3.one * (nodeRadius), Color.black);
                 Node playerN = NodeFromWorldPoint(new Vector3(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y));
                 Node enemyN = NodeFromWorldPoint(new Vector3(enemy.transform.position.x - transform.position.x, enemy.transform.position.y - transform.position.y));
                 if (n == playerN) {
-                    Gizmos.color = Color.cyan;
+                    Gizmos.Cube(n.worldPosition, transform.rotation, Vector3.one * (nodeRadius), Color.cyan);
                 }
                 if (n == enemyN) {
-                    Gizmos.color = Color.green;
+                    Gizmos.Cube(n.worldPosition, transform.rotation, Vector3.one * (nodeRadius), Color.green);
                 }
-                Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeRadius));
 
             }
         }
